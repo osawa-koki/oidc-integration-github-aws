@@ -1,0 +1,51 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation Template for GitHub OIDC Integration with AWS
+
+Parameters:
+  GitHubUser:
+    Type: String
+    Description: "Your GitHub User Name"
+  GitHubRepo:
+    Type: String
+    Description: "Your GitHub Repo Name"
+    Default: "*"
+
+Resources:
+  GitHubOIDCProvider:
+    Type: AWS::IAM::OIDCProvider
+    Properties:
+      Url: "https://token.actions.githubusercontent.com"
+      ClientIdList:
+        - "sts.amazonaws.com"
+
+  GitHubOIDCRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: GitHubOIDCRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: !GetAtt GitHubOIDCProvider.Arn
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringLike:
+                token.actions.githubusercontent.com:aud: "sts.amazonaws.com"
+                token.actions.githubusercontent.com:sub: !Sub "repo:${GitHubUser}/${GitHubRepo}:*"
+      Policies:
+        - PolicyName: "AdministratorAccess"
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: "*"
+                Resource: "*"
+
+Outputs:
+  GitHubOIDCProviderArn:
+    Description: "GitHub OIDC Provider ARN"
+    Value: !GetAtt GitHubOIDCProvider.Arn
+  GitHubOIDCRoleArn:
+    Description: "GitHub OIDC Role ARN"
+    Value: !GetAtt GitHubOIDCRole.Arn
