@@ -31,3 +31,31 @@ aws cloudformation describe-stacks \
 | シークレット名 | 値 |
 | --- | --- |
 | AWS_ROLE_ARN | `GitHubOIDCRoleArn`の値 |
+
+## おおさわメモ
+
+GUIでこれらのリソースを作成する場合のメモです！  
+
+### IDプロバイダーの作成
+
+「IAM」ページの「ID プロバイダ」メニューから、「プロバイダを追加」をクリックします。  
+
+![IDプロバイダー一覧](./images/id-providers-list-before-create.png)  
+
+「プロバイダのタイプ」で「OpenID Connect」を選択します。  
+その他の項目は以下の通りです。  
+
+| 項目 | 値 |
+| --- | --- |
+| プロバイダのURL | `https://token.actions.githubusercontent.com` |
+| 対象者 | `sts.amazonaws.com` |
+
+![IDプロバイダーの作成](./images/id-provider-setting.png)  
+
+その他の項目はデフォルトのままでOKです。  
+そのまま作成します。  
+
+一覧画面に戻ると、作成したIDプロバイダーが表示されていることが確認できます。  
+
+![IDプロバイダー一覧](./images/id-providers-list-after-create.png)  
+
